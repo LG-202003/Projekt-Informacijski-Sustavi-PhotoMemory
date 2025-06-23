@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Popis Fotografa</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    nav {
+      background-color: #111;
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 960px;
+      margin: auto;
+    }
+    .card {
+      background-color: #222;
+      border: none;
+      border-radius: 12px;
+      color: #eee;
+      box-shadow: 0 0 8px #6c63ff;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 14px #574bd8;
+    }
+    .card-title {
+      color: #6c63ff;
+      font-weight: 700;
+    }
+    .btn-primary, .btn-danger {
+      border-radius: 8px;
+      font-weight: 600;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+    .btn-primary:hover {
+      background-color: #574bd8;
+    }
+    .btn-danger:hover {
+      background-color: #b22222;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="#">PhotoMemory</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navMenu"
+        aria-controls="navMenu"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a href="{{ url_for('home') }}" class="nav-link">Početna</a></li>
+          <li class="nav-item"><a href="{{ url_for('dodaj_fotografa') }}" class="nav-link">Dodaj Fotografa</a></li>
+          <li class="nav-item"><a href="{{ url_for('vrati_fotografe') }}" class="nav-link active">Popis Fotografa</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+    <main>
+  <h2 class="mb-4 text-center">Popis Fotografa</h2>
+
+  <form method="GET" action="{{ url_for('vrati_fotografe_l') }}" class="mb-4">
+    <div class="row g-3 justify-content-center">
+      <div class="col-auto">
+        <input type="text" name="grad" placeholder="Grad" value="{{ request.args.get('grad', '') }}" class="form-control" />
+      </div>
+      <div class="col-auto">
+        <select name="dostupan" class="form-select">
+          <option value="" {% if not request.args.get('dostupan') %}selected{% endif %}>Sve</option>
+          <option value="true" {% if request.args.get('dostupan') == 'true' %}selected{% endif %}>Dostupni</option>
+          <option value="false" {% if request.args.get('dostupan') == 'false' %}selected{% endif %}>Nedostupni</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <input type="number" step="0.01" name="max_cijena" placeholder="Max cijena" value="{{ request.args.get('max_cijena', '') }}" class="form-control" />
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Filtriraj</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="row g-4">
+    {% for fotograf in data %}
+    <div class="col-md-4">
+      <div class="card p-3 h-100">
+        <h5 class="card-title">{{ fotograf.ime_i_prezime }}</h5>
+        <p class="mb-1"><strong>Grad:</strong> {{ fotograf.grad }}</p>
+        <p class="mb-1"><strong>Telefon:</strong> {{ fotograf.broj_telefona }}</p>
+        <p class="mb-2"><strong>Email:</strong> {{ fotograf.email or "Nije unesen" }}</p>
+        <p class="mb-1"><strong>Studio:</strong> {{ fotograf.studio }}</p>
+        <p class="mb-1"><strong>Cijena po satu:</strong> {{ fotograf.cijena_po_satu }} €</p>
+        <p class="mb-1"><strong>Dostupan:</strong> {{ 'Da' if fotograf.trenutna_dostupnost else 'Ne' }}</p>
+        <p class="mb-1"><strong>Događaji:</strong> {{ fotograf.dogadaji or "Nema podataka" }}</p>
+
+        <div class="d-flex justify-content-between">
+          <a href="{{ url_for('uredi_fotografa', fotograf_id=fotograf.id) }}" class="btn btn-primary btn-sm">Uredi</a>
+          <button class="btn btn-danger btn-sm" onclick="obrisiFotografa('{{ fotograf.id }}')">Obriši</button>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <p class="text-center">Nema unesenih fotografa.</p>
+    {% endfor %}
+  </div>
+ </main>
+
+ 
+
+  <script>
+    function obrisiFotografa(fotografId) {
+      if (confirm('Jeste li sigurni da želite obrisati ovog fotografa?')) {
+        fetch(`/fotograf/${fotografId}`, { method: 'DELETE' })
+          .then(res => res.json())
+          .then(data => {
+            if (data.response === 'Success') {
+              location.reload();
+            } else {
+              alert('Greška prilikom brisanja.');
+            }
+          })
+          .catch(() => alert('Greška prilikom slanja zahtjeva.'));
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

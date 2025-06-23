@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistika cijena po gradovima</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { padding: 2rem; font-family: sans-serif; }
+        canvas { max-width: 800px; margin: auto; display: block; }
+    </style>
+</head>
+<body>
+    <h2>Prosječna cijena fotografa po gradovima</h2>
+    <canvas id="cijeneChart" width="600" height="300"></canvas>
+
+    <script>
+        const x_axis = JSON.parse('{{ x_axis | tojson | safe }}');
+        const y_axis = JSON.parse('{{ y_axis | tojson | safe }}');
+
+        new Chart(document.getElementById("cijeneChart"), {
+            type: "bar",
+            data: {
+                labels: x_axis,
+                datasets: [{
+                    label: "Prosječna cijena (€/h)",
+                    data: y_axis,
+                    backgroundColor: "#4e73df"
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Cijena u eurima"
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Grad"
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
