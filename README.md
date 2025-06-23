@@ -16,4 +16,4 @@ PhotoMemory je web aplikacija koja prikazuje fotografe i informacije o njima. Mo
 2. Otvorite terminal i pokrenite git clone https://github.com/LG-202003/Projekt-Informacijski-Sustavi-PhotoMemory
 3. cd Projekt-Informacijski-Sustavi-PhotoMemory
 4. Pokrenuti Docker: docker build -t photomemory
-5.                   docker run -p 5001:8080 photomemory
+5. docker run -p 5001:8080 photomemory
